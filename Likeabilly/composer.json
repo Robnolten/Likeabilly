@@ -1,7 +1,0 @@
-{
-    "name": "rob/likeabilly",
-    "require": {
-        "mollie/mollie-api-php": "^2.79",
-        "phpmailer/phpmailer": "^6.9"
-    }
-}

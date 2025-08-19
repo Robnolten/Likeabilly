@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html,body{
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size:16px;
+  height:100%;
+  width:100%;
+  color:#777;
+  background-color:#8de8d8;
+  letter-spacing:-0.15px;
+  user-select: none; /* supported by Chrome and Opera */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */		
+}
+________________________________________________________________________
+/* Basis stijlen zoals voorheen, maar nu met Tailwind compatibiliteit */
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#react-app-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Fix voor 3D canvas container */
+.scene-container {
+  flex: 1;
+  background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  position: relative;
+  overflow: hidden;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Kleine sparkles/sterren in de achtergrond */
+.scene-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(white, rgba(255, 255, 255, 0) 2px);
+  background-size: 50px 50px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+// Voeg deze CSS toe aan je globale stijlen of in een <style jsx global> tag
+
+/* Basis layout fixes */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+
+.scene-container canvas {
+  width: 100% !important; 
+  height: 100% !important;
+}
+
+/* Fix voor gradient achtergrond */
+.bg-gradient-full {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #93c5fd 0%, #f9a8d4 50%, #f9a8d4 100%);
+  z-index: -1;
+}
+
+/* Fix voor configurator scrolling */
+.config-side {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.config-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+/* Media queries voor responsiveness */
+@media (max-width: 768px) {
+  .mobile-view-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+}
