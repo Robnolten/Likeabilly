@@ -10,17 +10,17 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy with FTP
+      - name: FTP-Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_DIR }}
-          protocol: ftp        # wijzig naar ftps of sftp als jouw host dat vereist
+          protocol: ftp       # of ftps (port 21) / sftp (port 22) afhankelijk van je host
           port: 21
           local-dir: .
           exclude: |
