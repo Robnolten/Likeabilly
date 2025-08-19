@@ -1,4 +1,4 @@
-name: Upload website via FTP
+name: Upload website naar VDX
 
 on:
   push:
@@ -10,17 +10,17 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: FTP-Deploy
+      - name: FTP-Deploy naar VDX
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_DIR }}
-          protocol: ftp       # of ftps (port 21) / sftp (port 22) afhankelijk van je host
+          server-dir: /httpdocs
+          protocol: ftps
           port: 21
           local-dir: .
           exclude: |
