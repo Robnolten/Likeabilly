@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Likeabilly - Parallax Header Demo</title>
+  
+  <!-- Poppins font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-color: #8d9bbe;
+      --text-color: #ffffff;
+      --shadow-color: rgba(0, 0, 0, 0.2);
+      --glow-color: rgba(255, 130, 220, 0.6);
+      --cloud-color: #5b6da9;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden; /* Voorkom scrollen op de pagina */
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      background-color: #121220;
+    }
+
+    /* Preloader */
+    .preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #121220;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    .preloader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .preloader__spinner {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 4px solid transparent;
+      border-top-color: var(--glow-color);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Fullscreen container voor alle secties */
+    .fullscreen-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sectie navigatie */
+    .section-nav {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .section-nav__dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    .section-nav__dot.active {
+      background-color: #ffffff;
+      transform: scale(1.3);
+    }
+
+    /* Parallax Header Container */
+    .parallax-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Content Section (Next section) */
+    .content-section {
+      position: absolute;
+      top: 100vh; /* Start direct onder de header */
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #ffffff;
+      z-index: 7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.8s cubic-bezier(0.8, 0, 0.2, 1);
+    }
+
+    .content-section.active {
+      transform: translateY(-100vh); /* Animeer naar boven wanneer actief */
+    }
+
+    /* Parallax Section (nieuwe vierde sectie) */
+    .parallax-section {
+      position: absolute;
+      top: 300vh; /* Start onder sectie 3 */
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9;
+      transition: top 0.8s cubic-bezier(0.8, 0, 0.2, 1);
+    }
+
+    /* Parallax Layers */
+    .parallax-layer {
+      position: absolute;
+      top: -5%;
+      left: -5%;
+      width: 110%;
+      height: 110%;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.1s ease-out;
+    }
+
+    /* Stars Background (deepest layer) */
+    .stars-bg {
+      background-image: url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=2071');
+      z-index: 1;
+      filter: brightness(1.2) saturate(1.2);
+    }
+
+    /* Far Clouds Layer */
+    .clouds-far {
+      background-image: url('https://images.unsplash.com/photo-1536514498073-50e69d39c6cf?q=80&w=2071');
+      background-size: 130% 130%;
+      opacity: 0.7;
+      z-index: 2;
+      animation: float-slow 25s ease-in-out infinite;
+      filter: hue-rotate(-10deg) brightness(0.9) saturate(1.5);
+      mix-blend-mode: screen;
+    }
+
+    /* Near Clouds Layer */
+    .clouds-near {
+      background-image: url('https://images.unsplash.com/photo-1497305730368-73bf8dcc6cc9?q=80&w=2075');
+      background-size: 130% 130%;
+      opacity: 0.8;
+      z-index: 3;
+      animation: float-medium 18s ease-in-out infinite;
+      filter: hue-rotate(-20deg) brightness(0.85) saturate(1.3);
+      mix-blend-mode: screen;
+    }
+    
+    /* Glow Effect Layer */
+    .glow-effect {
+      background: radial-gradient(circle at center, var(--glow-color) 0%, rgba(0, 0, 120, 0) 80%);
+      z-index: 4;
+      opacity: 0.9;
+      animation: pulse 6s ease-in-out infinite;
+      transform-origin: center center;
+    }
+
+    /* Bookcase Layer */
+    .bookcase-container {
+      position: absolute;
+      z-index: 5;
+      width: 300px;
+      height: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .bookcase {
+      width: 100%;
+      height: 100%;
+      background-image: url('./images/kast.png');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: brightness(1.1) drop-shadow(0 0 25px rgba(255, 150, 220, 0.7));
+    }
+
+    /* Text Layer */
+    .text-container {
+      position: relative;
+      z-index: 6;
+      color: var(--text-color);
+      text-align: center;
+      width: 100%;
+      padding: 2rem;
+      transform: translateY(calc(-10vh + 80px)); /* 80px lager dan voorheen */
+    }
+
+    .tagline {
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 300;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fade-in 1.5s ease forwards 0.5s;
+    }
+
+    .brand-name {
+      font-size: clamp(3rem, 15vw, 8rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffffd2;
+      /* text-shadow: 0 4px 15px var(--glow-color);*/
+      opacity: 0;
+      animation: fade-in 1.5s ease forwards, float-text 8s ease-in-out infinite 1.5s;
+    }
+
+    .slogan {
+      font-size: clamp(1rem, 3vw, 1.5rem);
+      font-weight: 300;
+      margin-top: 1rem;
+      opacity: 0;
+      animation: fade-in 1.5s ease forwards 1s;
+    }
+
+    /* Scroll-down indicator met tekst */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      width: 200px; /* Vaste breedte */
+      text-align: center;
+      z-index: 6;
+      opacity: 0;
+      animation: fade-in 1.5s ease forwards 2s, float 2s ease-in-out infinite 2s;
+      cursor: pointer;
+    }
+
+    .scroll-label {
+      display: block;
+      color: var(--text-color);
+      font-weight: 400;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .scroll-indicator svg {
+      width: 30px;
+      height: 30px;
+      fill: var(--text-color);
+      margin: 0 auto;
+      display: block;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .polka-dots-bg {
+      background: linear-gradient(to bottom right, #bfdbfe, #f1e1f7, #f9a8d4) !important;
+      background-image: radial-gradient(circle, white 8px, transparent 8px) !important;
+      background-size: 60px 60px !important;
+      animation: move-dots 60s linear infinite !important;
+    }
+
+    /* Scroll-down indicator met tekst */
+    .polka-scroll-indicator {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      width: 200px; /* Vaste breedte */
+      text-align: center;
+      z-index: 6;
+      opacity: 0;
+      animation: fade-in 1.5s ease forwards 2s, float 2s ease-in-out infinite 2s;
+      cursor: pointer;
+    }
+
+    /* Parallax content container voor vierde sectie */
+    .parallax-content {
+      position: relative;
+      z-index: 6;
+      padding: 2rem;
+      width: 80%; 
+      max-width: 1200px;
+      margin: 0 auto;
+      color: white;
+      text-align: center;
+    }
+
+    /* Animations */
+    @keyframes move-dots {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 60px 60px;
+      }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    @keyframes float-slow {
+      0%, 100% { transform: translate(-10px, 10px); }
+      50% { transform: translate(10px, -10px); }
+    }
+
+    @keyframes float-medium {
+      0%, 100% { transform: translate(-15px, 15px); }
+      50% { transform: translate(15px, -15px); }
+    }
+
+    @keyframes float-text {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.08); }
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .features-section {
+      position: absolute;
+      top: 200vh; /* Start direct onder de configurator sectie */
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #121220 !important; /* Donkere achtergrond zoals de header */
+      overflow: hidden; /* Voorkom dat de glow buiten de container komt */
+      z-index: 8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: top 0.8s cubic-bezier(0.8, 0, 0.2, 1);
+    }
+    
+    .feature-glow-effect {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, var(--glow-color) 0%, rgba(0, 0, 120, 0) 80%);
+      z-index: 0;
+      opacity: 0.6;
+      animation: pulse 8s ease-in-out infinite;
+    }
+
+    .features-container {
+      width: 90%;
+      max-width: 1200px;
+      padding: 2rem;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+    
+    .feature-box {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 130, 220, 0.4);
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      z-index: 1; /* Boven de glow effect */
+    }
+    
+    .feature-box:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 130, 220, 0.6);
+    }
+    
+    .feature-box h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+    
+    .feature-box p {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .polka-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;          /* Zorgt voor voldoende ruimte rondom de tekst */
+      text-align: left;   /* De tekst wordt rechts uitgelijnd binnen de container */
+      color: #4e46dc;      /* Witte tekstkleur */
+      font-size: clamp(0.5rem, 2vw, 1.1rem);  /* Zelfde grootte als de slogan */
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      padding: 2rem;       /* Extra ruimte rondom de tekst */
+    }
+
+    .polka-text p {
+      margin-bottom: 1.5rem;
+      color: #4e46dc;
+    }
+
+    .polka-box {
+      background-color: rgb(244, 174, 244, 0.05); /* Licht transparante witte achtergrond */
+      z-index: 15;
+      border-radius: 8px;
+      text-align: left;  
+      font-size: clamp(0.5rem, 2vw, 1.2rem);
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      max-width: 80%;
+      padding: 5rem;
+    }
+    
+    .polka-box p {
+      margin-bottom: 1.5rem;
+    
+    }
+
+    /* Media Queries */
+    @media (max-width: 768px) {
+      .text-container {
+        transform: translateY(calc(-5vh + 60px));
+      }
+      
+      .bookcase-container {
+        width: 200px;
+        height: 350px;
+      }
+     }
+  </style>
+</head>
+<body>
+
+<!-- Preloader -->
+<div class="preloader" id="preloader">
+  <div class="preloader__spinner"></div>
+</div>
+
+<!-- Fullscreen Container voor secties -->
+<div class="fullscreen-container">
+  <!-- Sectie Navigatie -->
+  <div class="section-nav" style="z-index: 10000;">
+    <div class="section-nav__dot active" data-section="0"></div>
+    <div class="section-nav__dot" data-section="1"></div>
+    <div class="section-nav__dot" data-section="2"></div>
+    <div class="section-nav__dot" data-section="3"></div>
+  </div>
+  
+  <!-- Parallax Header -->
+  <div class="parallax-header" id="parallax-header">
+    <!-- Parallax Background Layers -->
+    <div class="parallax-layer stars-bg" data-speed="0.25"></div>
+    <div class="parallax-layer clouds-far" data-speed="0.35"></div>
+    <div class="parallax-layer clouds-near" data-speed="0.5"></div>
+    <div class="parallax-layer glow-effect" data-speed="0.6"></div>
+    
+    <!-- Bookcase Element -->
+    <div class="bookcase-container" data-speed="0.15">
+      <div class="bookcase"></div>
+    </div>
+    
+    <!-- Text Elements -->
+    <div class="text-container">
+      <div class="tagline">eenvoudige boekenkasten op maat</div>
+      <div class="brand-name">likeabilly</div>
+      <div class="slogan">'s ochtends besteld, 's middags in huis</div>
+    </div>
+    
+    <!-- Scroll Indicator met Tekst -->
+    <div class="scroll-indicator" id="scroll-indicator">
+      <div class="scroll-label">En zo werkt dat...</div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30">
+        <path d="M12 21l-8-8h16l-8 8z"/>
+      </svg>
+    </div>
+  </div>
+  
+<!-- Content Section -->
+<div class="content-section" id="content-section">
+  <!-- Achtergrond -->
+  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom right, #bfdbfe, #f1e1f7, #f9a8d4);"></div>
+  <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: 
+    radial-gradient(circle, rgb(238, 196, 226) 3px, transparent 8px),
+    radial-gradient(circle, rgb(238, 196, 226) 3px, 6px, transparent 8px);  
+    background-position: 0 0, 30px 30px;
+    background-size: 60px 60px;
+    animation: move-dots 60s linear infinite;"></div>
+  
+  <!-- Content container behouden zoals het was -->
+  <div class="polka-box">
+    <!-- Header container met image, direct binnen polka-box -->
+    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+      <div class="brand-name" style="display: inline-block; margin-right: 20px;">likeabilly</div>
+      <img src="./images/kast_rond.png" alt="Boekenkast" style="height: 120px; width: auto; display: inline-block; vertical-align: middle;">
+    </div>
+    
+    <p>Likeabilly maakt boekenkasten zonder poespas. Een robuste romp, stevige planken en gaan met die banaan. Maar dan wel door een meubelmaker, op maat gemaakt voor jouw kamer.</p>
+    <p>Geef de buitenmaten van de kast op, kies je materiaal en bedenk hoeveel planken je erin wilt. Bestellen maar.</p>
+    <p>We gaan meteen voor je aan de slag. En ben je er vroeg bij met bestellen dan kun je vaak diezelfde dag je kast nog ophalen. Bezorgen doen we ook. Voor kasten breder dan 80 cm is dat zelfs gratis.</p>
+    <p>Monteren is een makkie, kun je gewoon zelf. Heb je hulp nodig, dan doen wij het graag voor je. Voor kasten breder dan 80 cm is ook dat gratis. Daarna schilder je 'm in de kleur die je wilt.</p>
+    <p>Onze kasten beginnen bij 149,-. Benieuwd wat die van jou kost? Bouw je kast hieronder en je ziet het vanzelf.</p>
+  </div>
+</div>
+
+<!-- Configurator section -->
+<div class="features-section" id="features-section">
+  <div id="react-app-container"></div>
+</div>
+
+<!-- Vierde sectie (parallax) -->
+<div class="parallax-section" id="parallax-section">
+  <!-- Parallax Background Layers - vergelijkbaar met de header -->
+  <div class="parallax-layer stars-bg" data-speed="0.25"></div>
+  <div class="parallax-layer clouds-far" data-speed="0.35"></div>
+  <div class="parallax-layer clouds-near" data-speed="0.5"></div>
+  <div class="parallax-layer glow-effect" data-speed="0.6"></div>
+  
+  <!-- Content container -->
+  <div class="parallax-content">
+    <h2 style="font-size: 3rem; margin-bottom: 2rem;">Vierde Sectie</h2>
+    <div style="background-color: rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 2rem; backdrop-filter: blur(5px);">
+      <p style="margin-bottom: 1rem; font-size: 1.2rem;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt, nunc nisl aliquam nisl, eget aliquam nunc nisl eget nisl.</p>
+      <p style="margin-bottom: 1rem; font-size: 1.2rem;">Proin nec nisl eget nisl aliquam aliquam. Nullam auctor, nisl eget ultricies tincidunt, nunc nisl aliquam nisl, eget aliquam nunc nisl eget nisl.</p>
+      <p style="font-size: 1.2rem;">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Preloader
+    const preloader = document.getElementById('preloader');
+    const images = document.querySelectorAll('img');
+    let imagesLoaded = 0;
+    
+    // Count background images in CSS
+    const bgElements = [
+      '.stars-bg',
+      '.clouds-far',
+      '.clouds-near',
+      '.bookcase'
+    ];
+    
+    // Count actual images
+    function imageLoaded() {
+      imagesLoaded++;
+      if (imagesLoaded >= images.length) {
+        hidePreloader();
+      }
+    }
+    
+    // For regular images
+    images.forEach(img => {
+      if (img.complete) {
+        imageLoaded();
+      } else {
+        img.addEventListener('load', imageLoaded);
+        img.addEventListener('error', imageLoaded);
+      }
+    });
+    
+    // For background images
+    bgElements.forEach(selector => {
+      const img = new Image();
+      const element = document.querySelector(selector);
+      if (element) {
+        const bgImg = getComputedStyle(element).backgroundImage;
+        const imgUrl = bgImg.replace(/url\(['"]?(.*?)['"]?\)/i, "$1");
+        img.src = imgUrl;
+        img.onload = imageLoaded;
+        img.onerror = imageLoaded;
+      }
+    });
+    
+    // Fallback if images take too long
+    setTimeout(hidePreloader, 3000);
+    
+    function hidePreloader() {
+      preloader.classList.add('hidden');
+      setTimeout(() => {
+        preloader.style.display = 'none';
+      }, 800);
+    }
+    
+    // Parallax effect on mouse movement voor beide parallax secties
+    const parallaxHeader = document.getElementById('parallax-header');
+    const parallaxSection = document.getElementById('parallax-section');
+    const layers = document.querySelectorAll('.parallax-layer, .bookcase-container');
+    
+    // Functie voor parallax effect
+    function handleParallax(e, container) {
+      const rect = container.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        
+        const layersInContainer = container.querySelectorAll('.parallax-layer, .bookcase-container');
+        layersInContainer.forEach(layer => {
+          const speed = parseFloat(layer.getAttribute('data-speed')) || 0.2;
+          const offsetX = (0.5 - x) * 70 * speed;
+          const offsetY = (0.5 - y) * 70 * speed;
+          
+          layer.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        });
+      }
+    }
+    
+    // Parallax voor header
+    parallaxHeader.addEventListener('mousemove', function(e) {
+      handleParallax(e, this);
+    });
+    
+    // Parallax voor vierde sectie
+    parallaxSection.addEventListener('mousemove', function(e) {
+      handleParallax(e, this);
+    });
+    
+    // Reset positie voor header wanneer muis vertrekt
+    parallaxHeader.addEventListener('mouseleave', function() {
+      resetLayerPositions(this);
+    });
+    
+    // Reset positie voor vierde sectie wanneer muis vertrekt
+    parallaxSection.addEventListener('mouseleave', function() {
+      resetLayerPositions(this);
+    });
+    
+    // Functie voor resetten van posities
+    function resetLayerPositions(container) {
+      const layersInContainer = container.querySelectorAll('.parallax-layer, .bookcase-container');
+      layersInContainer.forEach(layer => {
+        layer.style.transform = 'translate(0px, 0px)';
+        layer.style.transition = 'transform 0.8s ease-out';
+        
+        // Remove the transition after it completes
+        setTimeout(() => {
+          layer.style.transition = 'transform 0.1s ease-out';
+        }, 800);
+      });
+    }
+    
+    // Navigatie tussen secties
+    const contentSection = document.getElementById('content-section');
+    const featuresSection = document.getElementById('features-section');
+    const scrollIndicator = document.getElementById('scroll-indicator');
+    const sectionDots = document.querySelectorAll('.section-nav__dot');
+    
+    function navigateToSection(sectionIndex) {
+      // Deactiveer alle dots
+      sectionDots.forEach(dot => dot.classList.remove('active'));
+      // Activeer de juiste dot
+      sectionDots[sectionIndex].classList.add('active');
+      
+      if (sectionIndex === 0) {
+        // Navigeer naar de header
+        contentSection.classList.remove('active');
+        featuresSection.style.top = '200vh';
+        parallaxSection.style.top = '300vh';
+      } else if (sectionIndex === 1) {
+        // Navigeer naar de content sectie
+        contentSection.classList.add('active');
+        featuresSection.style.top = '200vh';
+        parallaxSection.style.top = '300vh';
+      } else if (sectionIndex === 2) {
+        // Navigeer naar de features sectie
+        contentSection.classList.add('active');
+        featuresSection.style.top = '0';
+        parallaxSection.style.top = '100vh';
+      } else if (sectionIndex === 3) {
+        // Navigeer naar de parallax sectie
+        contentSection.classList.add('active');
+        featuresSection.style.top = '0';
+        parallaxSection.style.top = '0';
+      }
+    }
+    
+    // Scroll indicator click event
+    scrollIndicator.addEventListener('click', function() {
+      navigateToSection(1);
+    });
+    
+    // Navigation dots click events
+    sectionDots.forEach(dot => {
+      dot.addEventListener('click', function() {
+        const sectionIndex = parseInt(this.getAttribute('data-section'));
+        navigateToSection(sectionIndex);
+      });
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        const activeDot = document.querySelector('.section-nav__dot.active');
+        const currentSection = parseInt(activeDot.getAttribute('data-section'));
+        if (currentSection < 3) {
+          navigateToSection(currentSection + 1);
+        }
+        e.preventDefault();
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        const activeDot = document.querySelector('.section-nav__dot.active');
+        const currentSection = parseInt(activeDot.getAttribute('data-section'));
+        if (currentSection > 0) {
+          navigateToSection(currentSection - 1);
+        }
+        e.preventDefault();
+      }
+    });
+    
+    // Wielnavigatie
+    let wheelThrottle = false;
+    document.addEventListener('wheel', function(e) {
+      if (wheelThrottle) return;
+      wheelThrottle = true;
+      
+      setTimeout(() => {
+        wheelThrottle = false;
+      }, 1400); // Voorkom te snel scrollen
+      
+      const activeDot = document.querySelector('.section-nav__dot.active');
+      const currentSection = parseInt(activeDot.getAttribute('data-section'));
+      
+      if (e.deltaY > 0) {
+        // Scroll omlaag
+        if (currentSection < 3) {
+          navigateToSection(currentSection + 1);
+        }
+      } else if (e.deltaY < 0) {
+        // Scroll omhoog
+        if (currentSection > 0) {
+          navigateToSection(currentSection - 1);
+        }
+      }
+    }, { passive: false });
+    
+    // Touch swipe navigatie voor mobiel
+    let touchStartY = 0;
+    let touchEndY = 0;
+    
+    document.addEventListener('touchstart', function(e) {
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+    
+    document.addEventListener('touchend', function(e) {
+      touchEndY = e.changedTouches[0].screenY;
+      handleSwipe();
+    }, { passive: true });
+    
+    function handleSwipe() {
+      const swipeDistance = touchStartY - touchEndY;
+      if (Math.abs(swipeDistance) < 50) return; // Minimum swipe distance
+      
+      const activeDot = document.querySelector('.section-nav__dot.active');
+      const currentSection = parseInt(activeDot.getAttribute('data-section'));
+      
+      if (swipeDistance > 0) {
+        // Swipe up
+        if (currentSection < 3) {
+          navigateToSection(currentSection + 1);
+        }
+      } else if (swipeDistance < 0) {
+        // Swipe down
+        if (currentSection > 0) {
+          navigateToSection(currentSection - 1);
+        }
+      }
+    }
+  });
+</script>
+<!-- Dit is waar je React-app wordt gemount -->
+<!-- <div id="root"></div> -->
+<div id="react-app-container"></div>
+<!-- Deze regel is cruciaal - hiermee weet Vite waar je app moet starten -->
+<script type="module" src="src/main.tsx"></script>
+</body>
+</html>
