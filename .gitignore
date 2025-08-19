@@ -135,7 +135,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-git rm -r --cached dist || true
-git add dist/assets
-git commit -m "chore: track configurator build (dist/assets)"
-git push origin main
+# --- allowlist voor build die we WEL willen tracken ---
+!dist/assets/
+!dist/assets/**
