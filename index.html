@@ -10,198 +10,112 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script src="https://js.mollie.com/v2/mollie.js"></script>
+  <!-- voorkom /favicon.ico 404 -->
+  <link rel="icon" href="data:,">
 
   <style>
     :root {
       --primary-color: #8d9bbe;
       --text-color: #ffffff;
       --shadow-color: rgba(0, 0, 0, 0.2);
-      --glow-color: rgba(255, 130, 220, 0.6); /* Wordt nu minder gebruikt, vervangen door roze */
-      --bright-pink: #FF1493; /* Nieuwe variabele voor roze */
+      --glow-color: rgba(255, 130, 220, 0.6);
+      --bright-pink: #FF1493;
       --cloud-color: #5b6da9;
     }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: 'Poppins', sans-serif; overflow-x: hidden; background-color: #121220; }
+    @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html, body {
-      height: 100%;
-      overflow: hidden;
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      overflow-x: hidden;
-      background-color: #121220;
-    }
-
-    /* Keyframes voor initiële inschuifanimatie */
-    @keyframes slideDown {
-      from {
-        transform: translateY(-100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    /* --- NAVIGATIEBALK STIJLEN --- */
     .main-navigation {
       position: fixed; top: 0; left: 0; width: 100%;
-      background-color: rgba(18, 18, 32, 0.3); /* Iets transparanter frosted effect */
-      backdrop-filter: blur(12px);
-      /* AANGEPAST: Smallere padding */
-      padding: 6px 0;
-      z-index: 10001;
-      /* box-shadow: 0 2px 5px rgba(0,0,0,0.2);*/ /* Optioneel: subtiele schaduw */
-      /* AANGEPAST: Hoekjes afgerond */
-      border-radius: 0 0 10px 10px;
-      /* AANGEPAST: Schaduw voor diepte */
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      border-bottom: 1px solid rgba(255, 255, 255, 1); /* Subtiel randje */
-
-      /* Initiële staat & animatie */
-      transform: translateY(-100%);
-      opacity: 0;
-      animation: slideDown 0.7s ease-out 0.5s forwards;
-
-      /* NIEUW: Transition voor auto-hide/show */
-      transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+      background-color: rgba(18, 18, 32, 0.3);
+      -webkit-backdrop-filter: blur(12px);
+              backdrop-filter: blur(12px);
+      padding: 6px 0; z-index: 10001; border-radius: 0 0 10px 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,1);
+      transform: translateY(-100%); opacity: 0; animation: slideDown 0.7s ease-out 0.5s forwards;
+      transition: transform .4s ease-out, opacity .4s ease-out;
     }
-
-    /* NIEUW: Stijl voor verborgen navigatiebalk */
-    .main-navigation.nav-hidden {
-        transform: translateY(-120%); /* Iets verder weg dan -100% */
-        opacity: 0;
-        pointer-events: none; /* Maak onklikbaar als verborgen */
-    }
-
-    .main-navigation ul { list-style: none; padding: 0; margin: 0; display: flex; justify-content: center; }
+    .main-navigation.nav-hidden { transform: translateY(-120%); opacity: 0; pointer-events: none; }
+    .main-navigation ul { list-style: none; display: flex; justify-content: center; }
     .main-navigation li { margin: 0 15px; }
-    .main-navigation a {
-      text-decoration: none; color: var(--text-color); font-weight: 500;
-      /* AANGEPAST: Smallere padding */
-      padding: 5px 10px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease-out;
-      display: inline-block;
-    }
-    .main-navigation a:hover {
-      /* AANGEPAST: Felroze kleur */
-      color: var(--bright-pink);
-      background-color: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px); /* Lift effect */
-    }
-    .main-navigation a.active {
-      /* AANGEPAST: Felroze kleur */
-      color: var(--bright-pink);
-      font-weight: 700;
-      transform: translateY(0); /* Geen lift voor actieve link */
-     }
+    .main-navigation a { text-decoration: none; color: var(--text-color); font-weight: 500; padding: 5px 10px; border-radius: 4px; transition: .3s; display: inline-block; }
+    .main-navigation a:hover { color: var(--bright-pink); background-color: rgba(255,255,255,.1); transform: translateY(-2px); }
+    .main-navigation a.active { color: var(--bright-pink); font-weight: 700; }
 
-    /* Preloader */
-    .preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #121220; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.8s ease, visibility 0.8s ease; }
+    .preloader { position: fixed; inset: 0; background: #121220; display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity .8s, visibility .8s; }
     .preloader.hidden { opacity: 0; visibility: hidden; }
     .preloader__spinner { width: 100px; height: 100px; border-radius: 50%; border: 4px solid transparent; border-top-color: var(--glow-color); animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Fullscreen container */
     .fullscreen-container { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
-
-    /* Sectie navigatie (bolletjes) */
     .section-nav { position: fixed; top: 50%; right: 20px; transform: translateY(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
-    .section-nav__dot { width: 12px; height: 12px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.5); cursor: pointer; transition: transform 0.3s ease, background-color 0.3s ease; }
-    .section-nav__dot.active { background-color: #ffffff; transform: scale(1.3); }
+    .section-nav__dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,.5); cursor: pointer; transition: .3s; }
+    .section-nav__dot.active { background: #fff; transform: scale(1.3); }
 
-    /* Algemene sectie stijl */
-    .section {
-        position: absolute; left: 0; width: 100vw; height: 100vh;
-        overflow: hidden;
-        display: flex; flex-direction: column;
-        justify-content: center; align-items: center;
-        transition: top 0.8s cubic-bezier(0.8, 0, 0.2, 1);
-    }
-
-    /* Specifieke sectie posities en styling */
+    .section { position: absolute; left: 0; width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: top .8s cubic-bezier(.8,0,.2,1); }
     .parallax-header { top: 0; z-index: 5; }
     .content-section { top: 100vh; z-index: 7; }
-     .features-section {
-      top: 200vh; background: #121220 !important; z-index: 8;
-      align-items: stretch; justify-content: flex-start;
-    }
-    #voorbeelden-section { top: 300vh; z-index: 9; background-color: #2a2a3a; }
-    #faq-section { top: 400vh; z-index: 10; background-color: #3a3a4a; }
-    #contact-section { top: 500vh; z-index: 11; background-color: #4a4a5a; }
+    .features-section { top: 200vh; background: #121220 !important; z-index: 8; align-items: stretch; justify-content: flex-start; }
+    #voorbeelden-section { top: 300vh; z-index: 9; background: #2a2a3a; }
+    #faq-section { top: 400vh; z-index: 10; background: #3a3a4a; }
+    #contact-section { top: 500vh; z-index: 11; background: #4a4a5a; }
 
-    /* --- Styling specifiek per sectie --- */
-    /* Parallax (Sectie 0) */
-    .parallax-layer { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; background-size: cover; background-position: center; transition: transform 0.1s ease-out; }
+    .parallax-layer { position: absolute; top: -5%; left: -5%; width: 110%; height: 110%; background-size: cover; background-position: center; transition: transform .1s ease-out; }
     .stars-bg { background-image: url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=2071'); z-index: 1; filter: brightness(1.2) saturate(1.2); }
-    .clouds-far { background-image: url('https://images.unsplash.com/photo-1536514498073-50e69d39c6cf?q=80&w=2071'); background-size: 130% 130%; opacity: 0.7; z-index: 2; animation: float-slow 25s ease-in-out infinite; filter: hue-rotate(-10deg) brightness(0.9) saturate(1.5); mix-blend-mode: screen; }
-    .clouds-near { background-image: url('https://images.unsplash.com/photo-1497305730368-73bf8dcc6cc9?q=80&w=2075'); background-size: 130% 130%; opacity: 0.8; z-index: 3; animation: float-medium 18s ease-in-out infinite; filter: hue-rotate(-20deg) brightness(0.85) saturate(1.3); mix-blend-mode: screen; }
-    .glow-effect { background: radial-gradient(circle at center, var(--glow-color) 0%, rgba(0, 0, 120, 0) 80%); z-index: 4; opacity: 0.9; animation: pulse 6s ease-in-out infinite; transform-origin: center center; }
+    .clouds-far { background-image: url('https://images.unsplash.com/photo-1536514498073-50e69d39c6cf?q=80&w=2071'); background-size: 130% 130%; opacity: .7; z-index: 2; animation: float-slow 25s ease-in-out infinite; filter: hue-rotate(-10deg) brightness(.9) saturate(1.5); mix-blend-mode: screen; }
+    .clouds-near{ background-image: url('https://images.unsplash.com/photo-1497305730368-73bf8dcc6cc9?q=80&w=2075'); background-size: 130% 130%; opacity: .8; z-index: 3; animation: float-medium 18s ease-in-out infinite; filter: hue-rotate(-20deg) brightness(.85) saturate(1.3); mix-blend-mode: screen; }
+    .glow-effect{ background: radial-gradient(circle at center, var(--glow-color) 0%, rgba(0,0,120,0) 80%); z-index: 4; opacity: .9; animation: pulse 6s ease-in-out infinite; transform-origin: center; }
     .bookcase-container { position: absolute; z-index: 5; width: 300px; height: 500px; display: flex; justify-content: center; align-items: center; animation: float 8s ease-in-out infinite; }
-    .bookcase { width: 100%; height: 100%; background-image: url('./images/kast.png'); background-size: contain; background-position: center; background-repeat: no-repeat; filter: brightness(1.1) drop-shadow(0 0 25px rgba(255, 150, 220, 0.7)); }
+    .bookcase { width: 100%; height: 100%; background-image: url('./kast-6WHJDjHr.png'); background-size: contain; background-position: center; background-repeat: no-repeat; filter: brightness(1.1) drop-shadow(0 0 25px rgba(255,150,220,.7)); }
+
     .text-container { position: relative; z-index: 6; color: var(--text-color); text-align: center; width: 100%; padding: 2rem; transform: translateY(calc(-10vh + 80px)); }
-    .tagline { font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 300; margin-bottom: 1rem; opacity: 0; animation: fade-in 1.5s ease forwards 0.5s; }
+    .tagline { font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 300; margin-bottom: 1rem; opacity: 0; animation: fade-in 1.5s ease forwards .5s; }
     .brand-name { font-size: clamp(3rem, 15vw, 8rem); font-weight: 700; letter-spacing: -0.02em; color: #ffffffd2; opacity: 0; animation: fade-in 1.5s ease forwards, float-text 8s ease-in-out infinite 1.5s; }
     .slogan { font-size: clamp(1rem, 3vw, 1.5rem); font-weight: 300; margin-top: 1rem; opacity: 0; animation: fade-in 1.5s ease forwards 1s; }
     .scroll-indicator { position: absolute; bottom: 2.5rem; left: 0; right: 0; margin: 0 auto; width: 200px; text-align: center; z-index: 6; opacity: 0; animation: fade-in 1.5s ease forwards 2s, float 2s ease-in-out infinite 2s; cursor: pointer; }
-    .scroll-label { display: block; color: var(--text-color); font-weight: 400; font-size: 1rem; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
-    .scroll-indicator svg { width: 30px; height: 30px; fill: var(--text-color); margin: 0 auto; display: block; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); }
+    .scroll-label { display: block; color: var(--text-color); font-weight: 400; font-size: 1rem; margin-bottom: .5rem; text-shadow: 0 2px 4px rgba(0,0,0,.3); }
+    .scroll-indicator svg { width: 30px; height: 30px; fill: var(--text-color); margin: 0 auto; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,.3)); }
 
-    /* Content Section (Sectie 1) Styling */
-    .polka-box { background-color: rgb(244, 174, 244, 0.05); position: relative; z-index: 1; border-radius: 8px; text-align: left; font-size: clamp(0.5rem, 2vw, 1.2rem); font-family: 'Poppins', sans-serif; line-height: 1.6; max-width: 80%; padding: 5rem; margin: auto; }
+    .polka-box { background: rgba(244,174,244,.05); position: relative; z-index: 1; border-radius: 8px; text-align: left; font-size: clamp(.5rem, 2vw, 1.2rem); line-height: 1.6; max-width: 80%; padding: 5rem; margin: auto; }
     .polka-box p { margin-bottom: 1.5rem; color: #4e46dc; }
-    @keyframes move-dots { 0% { background-position: 0 0; } 100% { background-position: 60px 60px; } }
+    @keyframes move-dots { to { background-position: 60px 60px; } }
 
-    /* Features Section (Sectie 2) Styling */
-    .feature-glow-effect { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; background: radial-gradient(circle at center, var(--glow-color) 0%, rgba(0, 0, 120, 0) 80%); z-index: 0; opacity: 0.6; animation: pulse 8s ease-in-out infinite; }
-    #react-app-container {
-      width: 100%; height: 100%;
-      position: relative; z-index: 1;
-      overflow-y: auto; /* Sta scrollen toe indien nodig */
-      /* Optional scrollbar styling */
-       &::-webkit-scrollbar { width: 8px; }
-       &::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 4px;}
-       &::-webkit-scrollbar-thumb { background: rgba(141, 155, 190, 0.6); border-radius: 4px;}
-       &::-webkit-scrollbar-thumb:hover { background: rgba(141, 155, 190, 0.8); }
-    }
+    .feature-glow-effect { position: absolute; inset: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, var(--glow-color) 0%, rgba(0,0,120,0) 80%); z-index: 0; opacity: .6; animation: pulse 8s ease-in-out infinite; }
+    #react-app-container { width: 100%; height: 100%; position: relative; z-index: 1; overflow-y: auto; }
+    /* >>> Belangrijk: standaard Vite/React mount is #root. Daarom voegen we 'm toe: */
+    #root { width: 100%; height: 100%; }
 
-    /* Placeholder styling voor nieuwe secties (3, 4, 5) */
     .placeholder-content { color: white; text-align: center; max-width: 800px; padding: 2rem; }
     .placeholder-content h2 { font-size: 3rem; margin-bottom: 1rem; }
     .placeholder-content p { font-size: 1.2rem; line-height: 1.6; }
     .placeholder-content ul { list-style: none; padding: 0;}
-    .placeholder-content li { margin-bottom: 0.5rem; }
+    .placeholder-content li { margin-bottom: .5rem; }
 
-    /* Animations */
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-    @keyframes float-slow { 0%, 100% { transform: translate(-10px, 10px); } 50% { transform: translate(10px, -10px); } }
-    @keyframes float-medium { 0%, 100% { transform: translate(-15px, 15px); } 50% { transform: translate(15px, -15px); } }
-    @keyframes float-text { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.08); } }
+    @keyframes float { 50% { transform: translateY(-20px); } }
+    @keyframes float-slow { 50% { transform: translate(10px,-10px); } }
+    @keyframes float-medium { 50% { transform: translate(15px,-15px); } }
+    @keyframes float-text { 50% { transform: translateY(-10px); } }
+    @keyframes pulse { 50% { opacity: .9; transform: scale(1.08); } }
     @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Media Queries */
     @media (max-width: 768px) {
       .text-container { transform: translateY(calc(-5vh + 60px)); }
       .bookcase-container { width: 200px; height: 350px; }
       .main-navigation ul { justify-content: space-around; }
       .main-navigation li { margin: 0 5px; }
-      .main-navigation a { padding: 6px 8px; font-size: 0.9rem; }
+      .main-navigation a { padding: 6px 8px; font-size: .9rem; }
       .polka-box { max-width: 90%; padding: 2rem; }
-       #react-app-container { /* padding: 1rem; */ }
     }
   </style>
-  
+
+  <!-- bundelpaden relatief (zelfde map) -->
+  <script type="module" crossorigin src="./index-Cctyz7mh.js"></script>
+  <link rel="stylesheet" crossorigin href="./index-DTzwRa2i.css">
 </head>
 <body>
+
 <nav class="main-navigation" id="main-navigation">
   <ul>
     <li><a href="#" data-target-section="0">Home</a></li>
@@ -213,9 +127,7 @@
   </ul>
 </nav>
 
-<div class="preloader" id="preloader">
-  <div class="preloader__spinner"></div>
-</div>
+<div class="preloader" id="preloader"><div class="preloader__spinner"></div></div>
 
 <div class="fullscreen-container">
   <div class="section-nav">
@@ -245,226 +157,246 @@
   </div>
 
   <div class="section content-section" id="content-section">
-      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom right, #bfdbfe, #f1e1f7, #f9a8d4); z-index: -2;"></div>
-      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle, rgb(238, 196, 226) 3px, transparent 8px), radial-gradient(circle, rgb(238, 196, 226) 3px, transparent 8px); background-position: 0 0, 30px 30px; background-size: 60px 60px; animation: move-dots 60s linear infinite; z-index: -1;"></div>
-      <div class="polka-box">
-         <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-             <div class="brand-name" style="font-size: 3rem; display: inline-block; margin-right: 20px; color: #4e46dc;">likeabilly</div>
-             <img src="./images/kast_rond.png" alt="Boekenkast" style="height: 120px; width: auto; display: inline-block; vertical-align: middle;">
-         </div>
-         <p>Likeabilly maakt GEEN boekenkasten zonder poespas...</p>
-         <p>Geef de buitenmaten van de kast op...</p>
-         <p>We gaan meteen voor je aan de slag...</p>
-         <p>Monteren is een makkie...</p>
-         <p>Onze kasten beginnen bij 149,-...</p>
+    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom right, #bfdbfe, #f1e1f7, #f9a8d4); z-index: -2;"></div>
+    <div style="position: absolute; inset: 0; background-image: radial-gradient(circle, rgb(238,196,226) 3px, transparent 8px), radial-gradient(circle, rgb(238,196,226) 3px, transparent 8px); background-position: 0 0, 30px 30px; background-size: 60px 60px; animation: move-dots 60s linear infinite; z-index: -1;"></div>
+    <div class="polka-box">
+      <div style="display:flex; align-items:center; margin-bottom:1rem;">
+        <div class="brand-name" style="font-size:3rem; display:inline-block; margin-right:20px; color:#4e46dc;">likeabilly</div>
+        <img src="./kast_rond-COjER7tF.png" alt="Boekenkast" style="height:120px; width:auto; display:inline-block; vertical-align:middle;">
       </div>
+      <p>Likeabilly maakt boekenkasten zonder poespas...</p>
+      <p>Geef de buitenmaten van de kast op...</p>
+      <p>We gaan meteen voor je aan de slag...</p>
+      <p>Monteren is een makkie...</p>
+      <p>Onze kasten beginnen bij 149,-...</p>
+    </div>
   </div>
 
   <div class="section features-section" id="features-section">
-     <div class="feature-glow-effect"></div>
-     <div id="react-app-container">
-        </div>
+    <div class="feature-glow-effect"></div>
+    <!-- Belangrijk: mount targets -->
+    <div id="react-app-container">
+      <div id="root"></div>
+    </div>
   </div>
 
   <div class="section" id="voorbeelden-section">
     <div class="placeholder-content">
-        <h2>Voorbeelden</h2>
-        <p>Hier komt binnenkort informatie over en voorbeelden van onze kasten...</p>
+      <h2>Voorbeelden</h2>
+      <p>Hier komt binnenkort informatie over en voorbeelden van onze kasten...</p>
     </div>
   </div>
 
   <div class="section" id="faq-section">
-     <div class="placeholder-content">
-        <h2>Veelgestelde Vragen</h2>
-        <p>Hier kun je antwoorden geven op veelgestelde vragen...</p>
-        <ul><li>Vraag 1? Antwoord 1...</li><li>Vraag 2? Antwoord 2...</li></ul>
-     </div>
+    <div class="placeholder-content">
+      <h2>Veelgestelde Vragen</h2>
+      <p>Hier kun je antwoorden geven op veelgestelde vragen...</p>
+      <ul><li>Vraag 1? Antwoord 1...</li><li>Vraag 2? Antwoord 2...</li></ul>
+    </div>
   </div>
 
   <div class="section" id="contact-section">
-      <div class="placeholder-content">
-        <h2>Contact</h2>
-        <p>Neem contact met ons op...</p>
-        <p>Email: info@likeabilly.nl</p>
-        <p>Telefoon: 010-1234567</p>
-     </div>
+    <div class="placeholder-content">
+      <h2>Contact</h2>
+      <p>Neem contact met ons op...</p>
+      <p>Email: info@likeabilly.nl</p>
+      <p>Telefoon: 010-1234567</p>
+    </div>
   </div>
 
-</div> <script>
+</div>
+
+<script>
   document.addEventListener('DOMContentLoaded', function() {
-    // --- Preloader Logic ---
     const preloader = document.getElementById('preloader');
     if (preloader) {
-        const images = document.querySelectorAll('img'); let imagesLoaded = 0; const totalImages = images.length;
-        function imageLoaded() { imagesLoaded++; if (imagesLoaded >= totalImages) hidePreloader(); }
-        if (totalImages === 0) { hidePreloader(); } else {
-            images.forEach(img => { if (img.complete) imageLoaded(); else { img.addEventListener('load', imageLoaded); img.addEventListener('error', imageLoaded); } });
-            setTimeout(hidePreloader, 4000);
+      const images = document.querySelectorAll('img'); let imagesLoaded = 0; const totalImages = images.length;
+      function imageLoaded() { imagesLoaded++; if (imagesLoaded >= totalImages) hidePreloader(); }
+      if (totalImages === 0) { hidePreloader(); }
+      else {
+        images.forEach(img => { if (img.complete) imageLoaded(); else { img.addEventListener('load', imageLoaded); img.addEventListener('error', imageLoaded); } });
+        setTimeout(hidePreloader, 4000);
+      }
+      function hidePreloader() {
+        if (preloader && !preloader.classList.contains('hidden')) {
+          preloader.classList.add('hidden');
+          setTimeout(() => { if (preloader) preloader.style.display = 'none'; }, 800);
         }
-        function hidePreloader() { if (preloader && !preloader.classList.contains('hidden')) { preloader.classList.add('hidden'); setTimeout(() => { if(preloader) preloader.style.display = 'none'; }, 800); } }
-    } else { console.warn("Preloader element not found"); }
+      }
+    }
 
-    // --- Parallax Effect Logic ---
     const parallaxContainers = document.querySelectorAll('.parallax-header');
-    function handleParallax(e, container) { if (!container) return; const rect = container.getBoundingClientRect(); if (rect.top < window.innerHeight && rect.bottom > 0) { const x = (e.clientX - rect.left) / rect.width; const y = (e.clientY - rect.top) / rect.height; const layersInContainer = container.querySelectorAll('.parallax-layer, .bookcase-container'); layersInContainer.forEach(layer => { const speed = parseFloat(layer.getAttribute('data-speed')) || 0.2; const offsetX = (0.5 - x) * 70 * speed; const offsetY = (0.5 - y) * 70 * speed; layer.style.transform = `translate(${offsetX}px, ${offsetY}px)`; });}}
-    parallaxContainers.forEach(container => { container.addEventListener('mousemove', function(e) { handleParallax(e, this); }); container.addEventListener('mouseleave', function() { resetLayerPositions(this); });});
-    function resetLayerPositions(container) { if (!container) return; const layersInContainer = container.querySelectorAll('.parallax-layer, .bookcase-container'); layersInContainer.forEach(layer => { layer.style.transition = 'transform 0.8s ease-out'; layer.style.transform = 'translate(0px, 0px)'; setTimeout(() => { if (layer) layer.style.transition = 'transform 0.1s ease-out'; }, 800); });}
+    function handleParallax(e, container) {
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        const layers = container.querySelectorAll('.parallax-layer, .bookcase-container');
+        layers.forEach(layer => {
+          const speed = parseFloat(layer.getAttribute('data-speed')) || 0.2;
+          const offsetX = (0.5 - x) * 70 * speed;
+          const offsetY = (0.5 - y) * 70 * speed;
+          layer.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        });
+      }
+    }
+    parallaxContainers.forEach(container => {
+      container.addEventListener('mousemove', function(e) { handleParallax(e, this); });
+      container.addEventListener('mouseleave', function() {
+        const layers = this.querySelectorAll('.parallax-layer, .bookcase-container');
+        layers.forEach(layer => {
+          layer.style.transition = 'transform .8s ease-out';
+          layer.style.transform = 'translate(0,0)';
+          setTimeout(() => { if (layer) layer.style.transition = 'transform .1s ease-out'; }, 800);
+        });
+      });
+    });
 
-    // --- Sectie Navigatie Logic ---
     const sections = document.querySelectorAll('.fullscreen-container > .section');
     const sectionDots = document.querySelectorAll('.section-nav__dot');
     const scrollIndicator = document.getElementById('scroll-indicator');
     const mainNavLinks = document.querySelectorAll('#main-navigation a[data-target-section]');
     const totalSections = sections.length;
-    let isNavigating = false; // Slot om navigatie tijdens animatie te voorkomen
-    let wheelThrottle = false; // Throttle voor snelle wheel events
+    let isNavigating = false;
+    let wheelThrottle = false;
 
-    function updateMainNavActiveState(activeIndex) { mainNavLinks.forEach(link => { if (link && link.hasAttribute('data-target-section')) { const targetSection = parseInt(link.getAttribute('data-target-section')); if (!isNaN(targetSection)) { if (targetSection === activeIndex) link.classList.add('active'); else link.classList.remove('active'); } } });}
-    function navigateToSection(sectionIndex) { if (sectionIndex < 0 || sectionIndex >= totalSections) return; sectionDots.forEach((dot, index) => { if(dot) { if (index === sectionIndex) dot.classList.add('active'); else dot.classList.remove('active'); }}); updateMainNavActiveState(sectionIndex); sections.forEach((section, index) => { if (section) section.style.top = `${(index - sectionIndex) * 100}vh`; });}
-    function safeNavigateToSection(index) { if (!isNavigating) { isNavigating = true; navigateToSection(index); setTimeout(() => { isNavigating = false; }, 800); } }
+    function updateMainNavActiveState(activeIndex) {
+      mainNavLinks.forEach(link => {
+        const attr = link.getAttribute('data-target-section');
+        if (!attr) return;
+        const targetSection = parseInt(attr);
+        if (isNaN(targetSection)) return;
+        if (targetSection === activeIndex) link.classList.add('active');
+        else link.classList.remove('active');
+      });
+    }
 
-    // --- Event Listeners ---
-    mainNavLinks.forEach(link => { link.addEventListener('click', function(e) { e.preventDefault(); const targetSectionIndex = parseInt(this.getAttribute('data-target-section')); if (!isNaN(targetSectionIndex)) { safeNavigateToSection(targetSectionIndex); } }); });
-    sectionDots.forEach(dot => { dot.addEventListener('click', function() { const sectionIndex = parseInt(this.getAttribute('data-section')); if (!isNaN(sectionIndex)) { safeNavigateToSection(sectionIndex); } }); });
-    if (scrollIndicator) { scrollIndicator.addEventListener('click', function() { safeNavigateToSection(1); }); }
-    document.addEventListener('keydown', function(e) { if (isNavigating) return; const activeDot = document.querySelector('.section-nav__dot.active'); if (!activeDot) return; const currentSection = parseInt(activeDot.getAttribute('data-section')); if(isNaN(currentSection)) return; let navigateAction = 0; if (e.key === 'ArrowDown' || e.key === 'PageDown') { if (currentSection < totalSections - 1) navigateAction = 1; } else if (e.key === 'ArrowUp' || e.key === 'PageUp') { if (currentSection > 0) navigateAction = -1; } if (navigateAction !== 0) { e.preventDefault(); safeNavigateToSection(currentSection + navigateAction); } });
+    function navigateToSection(sectionIndex) {
+      if (sectionIndex < 0 || sectionIndex >= totalSections) return;
+      sectionDots.forEach((dot, index) => {
+        if (index === sectionIndex) dot.classList.add('active');
+        else dot.classList.remove('active');
+      });
+      sections.forEach((section, index) => {
+        section.style.top = `${(index - sectionIndex) * 100}vh`;
+      });
+      updateMainNavActiveState(sectionIndex);
+    }
 
-    // --- Auto-Hide Navigatiebalk Logic ---
+    function safeNavigateToSection(index) {
+      if (isNavigating) return;
+      isNavigating = true;
+      navigateToSection(index);
+      setTimeout(() => { isNavigating = false; }, 800);
+    }
+
+    mainNavLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const v = this.getAttribute('data-target-section');
+        if (v == null) return;
+        const idx = parseInt(v);
+        if (!isNaN(idx)) safeNavigateToSection(idx);
+      });
+    });
+    sectionDots.forEach(dot => {
+      dot.addEventListener('click', function() {
+        const v = this.getAttribute('data-section');
+        if (v == null) return;
+        const idx = parseInt(v);
+        if (!isNaN(idx)) safeNavigateToSection(idx);
+      });
+    });
+    if (scrollIndicator) {
+      scrollIndicator.addEventListener('click', function() { safeNavigateToSection(1); });
+    }
+
     const navBar = document.getElementById('main-navigation');
     let hideNavTimer = null;
-    const navTriggerHeight = 80; // Pixels van boven om te tonen
-    const navHideDelay = 3000; // ms inactiviteit voor verbergen
+    const navTriggerHeight = 80;
+    const navHideDelay = 3000;
 
-    function showNav() {
-        if (navBar) {
-            navBar.classList.remove('nav-hidden');
-        }
-    }
+    function showNav() { if (navBar) navBar.classList.remove('nav-hidden'); }
+    function hideNav() { if (navBar && !navBar.matches(':hover')) navBar.classList.add('nav-hidden'); else if (navBar) resetHideTimer(); }
+    function resetHideTimer() { clearTimeout(hideNavTimer); hideNavTimer = setTimeout(hideNav, navHideDelay); }
 
-    function hideNav() {
-        // Verberg alleen als muis NIET boven de balk hangt
-        // En als de balk bestaat uiteraard
-        if (navBar && !navBar.matches(':hover')) {
-             navBar.classList.add('nav-hidden');
-        } else if (navBar) {
-            // Als muis er wel boven hangt, probeer later opnieuw te verbergen
-            resetHideTimer();
-        }
-    }
-
-    function resetHideTimer() {
-        clearTimeout(hideNavTimer);
-        hideNavTimer = setTimeout(hideNav, navHideDelay);
-    }
-
-    // Muisbeweging detectie voor tonen balk
     document.addEventListener('mousemove', function(e) {
-        // Als de navigatie niet bestaat, doe niets
-        if (!navBar) return;
-
-        if (e.clientY < navTriggerHeight) {
-            // Muis is bovenaan het scherm
-            if (navBar.classList.contains('nav-hidden')) {
-                showNav(); // Alleen tonen als hij verborgen was
-            }
-            resetHideTimer(); // Reset timer (blijft zichtbaar zolang muis bovenin is)
-        }
-        // Geen else hier; we starten de timer niet bij elke beweging buiten de zone
+      if (!navBar) return;
+      if (e.clientY < navTriggerHeight) {
+        if (navBar.classList.contains('nav-hidden')) showNav();
+        resetHideTimer();
+      }
     });
-
-    // Houd balk zichtbaar als muis eroverheen gaat
     if (navBar) {
-        navBar.addEventListener('mouseenter', function() {
-            // console.log("Mouse entered nav, clearing timer."); // Debug
-            clearTimeout(hideNavTimer); // Stop verbergen
-        });
-
-        // Start timer opnieuw als muis de balk verlaat
-        navBar.addEventListener('mouseleave', function() {
-            // console.log("Mouse left nav, resetting timer."); // Debug
-            resetHideTimer();
-        });
+      navBar.addEventListener('mouseenter', function() { clearTimeout(hideNavTimer); });
+      navBar.addEventListener('mouseleave', function() { resetHideTimer(); });
     }
-
-    // Start de allereerste timer nadat de initiele slide-down animatie klaar zou moeten zijn
-    // Animatie duur 0.7s + delay 0.5s = 1.2s. Neem buffer.
     setTimeout(resetHideTimer, 1500);
 
-    // --- Einde Auto-Hide Logic ---
-
-
-    // Muiswiel / Trackpad Navigatie (Aangepast met Boundary Check)
     document.addEventListener('wheel', function(e) {
-        if (isNavigating) {
-            return; // Respecteer animatie slot
+      if (isNavigating) return;
+
+      const reactAppContainer = document.getElementById('react-app-container');
+      let target = e.target;
+      let allowInternalScroll = false;
+      let atBoundaryInsideApp = false;
+
+      if (reactAppContainer && reactAppContainer.contains(target)) {
+        let el = target;
+        while (el && el !== document.body) {
+          if (el.scrollHeight > el.clientHeight) {
+            const down = e.deltaY > 0;
+            const atTop = el.scrollTop === 0;
+            const atBottom = Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop) < 1.5;
+            if ((!down && atTop) || (down && atBottom)) atBoundaryInsideApp = true;
+            else allowInternalScroll = true;
+            break;
+          }
+          if (el === reactAppContainer) break;
+          el = el.parentElement;
         }
+      }
 
-        const reactAppContainer = document.getElementById('react-app-container');
-        let targetElement = e.target;
-        let allowInternalScroll = false;
-        let isAtBoundaryInsideApp = false;
+      if (allowInternalScroll) return;
+      if (atBoundaryInsideApp) { e.preventDefault(); return; }
 
-        if (reactAppContainer && reactAppContainer.contains(targetElement)) {
-            let elementToCheck = targetElement;
-            while (elementToCheck && elementToCheck !== document.body) {
-                 if (elementToCheck.scrollHeight > elementToCheck.clientHeight) {
-                     const isScrollingDown = e.deltaY > 0;
-                     const isAtTop = elementToCheck.scrollTop === 0;
-                     const isAtBottom = Math.abs(elementToCheck.scrollHeight - elementToCheck.clientHeight - elementToCheck.scrollTop) < 1.5;
-                     if ((!isScrollingDown && isAtTop) || (isScrollingDown && isAtBottom)) {
-                         isAtBoundaryInsideApp = true;
-                     } else {
-                         allowInternalScroll = true;
-                     }
-                     break;
-                 }
-                 if (elementToCheck === reactAppContainer) break;
-                 elementToCheck = elementToCheck.parentElement;
-            }
-        }
+      if (wheelThrottle) return;
+      wheelThrottle = true;
+      setTimeout(() => { wheelThrottle = false; }, 1600);
 
-        if (allowInternalScroll) {
-            return; // Laat browser scrollen
-        }
+      const activeDot = document.querySelector('.section-nav__dot.active');
+      if (!activeDot) return;
+      const current = parseInt(activeDot.getAttribute('data-section') || '0');
+      let step = 0;
+      if (e.deltaY > 0) { if (current < totalSections - 1) step = 1; }
+      else if (e.deltaY < 0) { if (current > 0) step = -1; }
 
-        if (isAtBoundaryInsideApp) {
-             e.preventDefault(); // Voorkom body scroll
-             return; // Stop, geen sectie nav
-        }
-
-        // --- Sectie Navigatie ---
-        if (wheelThrottle) { return; }
-        wheelThrottle = true;
-        setTimeout(() => { wheelThrottle = false; }, 1600); // Jouw throttle tijd
-
-        const activeDot = document.querySelector('.section-nav__dot.active');
-        if (!activeDot) return;
-        const currentSection = parseInt(activeDot.getAttribute('data-section'));
-        if(isNaN(currentSection)) return;
-
-        let navigateAction = 0;
-        if (e.deltaY > 0) { if (currentSection < totalSections - 1) navigateAction = 1; }
-        else if (e.deltaY < 0) { if (currentSection > 0) navigateAction = -1; }
-
-        if (navigateAction !== 0) {
-            e.preventDefault();
-            safeNavigateToSection(currentSection + navigateAction);
-        }
-
+      if (step !== 0) {
+        e.preventDefault();
+        safeNavigateToSection(current + step);
+      }
     }, { passive: false });
 
-    // Touch Swipe Navigatie
     let touchStartY = 0; let touchEndY = 0;
-    document.addEventListener('touchstart', function(e) { touchStartY = e.changedTouches[0].screenY; }, { passive: true });
-    document.addEventListener('touchend', function(e) { if (e.target.closest('#react-app-container')) { return; } handleSwipe(); }, { passive: true });
-    function handleSwipe() { if (isNavigating) return; const swipeDistance = touchStartY - touchEndY; if (Math.abs(swipeDistance) < 50) return; const activeDot = document.querySelector('.section-nav__dot.active'); if (!activeDot) return; const currentSection = parseInt(activeDot.getAttribute('data-section')); if(isNaN(currentSection)) return; let navigateAction = 0; if (swipeDistance > 0) { if (currentSection < totalSections - 1) navigateAction = 1; } else if (swipeDistance < 0) { if (currentSection > 0) navigateAction = -1; } if (navigateAction !== 0) { safeNavigateToSection(currentSection + navigateAction); } touchStartY = 0; touchEndY = 0; }
+    document.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].screenY; }, { passive: true });
+    document.addEventListener('touchend', e => { if (!e.target.closest('#react-app-container')) handleSwipe(); }, { passive: true });
+    function handleSwipe() {
+      if (isNavigating) return;
+      const d = touchStartY - touchEndY;
+      if (Math.abs(d) < 50) return;
+      const activeDot = document.querySelector('.section-nav__dot.active');
+      if (!activeDot) return;
+      const current = parseInt(activeDot.getAttribute('data-section') || '0');
+      let step = 0;
+      if (d > 0) { if (current < totalSections - 1) step = 1; }
+      else if (d < 0) { if (current > 0) step = -1; }
+      if (step !== 0) safeNavigateToSection(current + step);
+      touchStartY = 0; touchEndY = 0;
+    }
 
-
-    // --- Initialisatie ---
-    navigateToSection(0); // Start op sectie 0
-
+    navigateToSection(0);
   });
 </script>
-
 </body>
 </html>
