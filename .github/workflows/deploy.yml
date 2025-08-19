@@ -1,4 +1,4 @@
-name: Upload website naar VDX
+name: Upload via SFTP
 
 on:
   push:
@@ -10,23 +10,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: FTP-Deploy naar VDX
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - uses: actions/checkout@v4
+      - name: Upload files
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          host: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /httpdocs/
-          protocol: ftps
-          port: 21
-          local-dir: ./
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/.DS_Store
-            **/Thumbs.db
-            **/*.md
+          port: 22
+          source: "./*"
+          target: "/httpdocs/"
