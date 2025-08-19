@@ -13,11 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Upload 1: je gewone site (root) naar /httpdocs/
+      # Upload 1: root-site naar /httpdocs/
       - name: Upload root site (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}     # bv. ftp.jouw-eigen-domein.nl (zonder ftp://)
+          server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
@@ -28,13 +28,12 @@ jobs:
             **/.git*
             **/.github/**
             **/node_modules/**
-            **/configurator/**
-            **/dist/**            # <-- dist niet vanuit root uploaden
+            **/dist/**
             **/.DS_Store
             **/Thumbs.db
             **/*.md
 
-      # Upload 2: je configurator build (zoals nu bij jou): ./dist/assets/ -> /httpdocs/configurator/
+      # Upload 2: de volledige configurator-map naar /httpdocs/configurator/
       - name: Upload configurator build (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
