@@ -10,10 +10,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Upload 1: root-site naar /httpdocs/
+      # 1) Root site naar /httpdocs (zoals je al had)
       - name: Upload root site (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -28,13 +27,13 @@ jobs:
             **/.git*
             **/.github/**
             **/node_modules/**
-            **/dist/**
+            **/dist/**        # <-- we uploaden dist apart hieronder
             **/.DS_Store
             **/Thumbs.db
             **/*.md
 
-      # Upload 2: de volledige configurator-map naar /httpdocs/configurator/
-      - name: Upload configurator build (FTP)
+      # 2) ALLEEN het configurator index.html naar /httpdocs/configurator/
+      - name: Upload configurator index.html
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -45,5 +44,25 @@ jobs:
           server-dir: /httpdocs/configurator/
           local-dir: ./dist/assets/
           exclude: |
-            **/.DS_Store
-            **/Thumbs.db
+            **/*.js
+            **/*.css
+            **/*.map
+            **/*.png
+            **/*.jpg
+            **/*.jpeg
+            **/*.gif
+            **/*.svg
+
+      # 3) ALLE assets (js/css/img) naar /httpdocs/assets/
+      - name: Upload configurator assets
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          server-dir: /httpdocs/assets/
+          local-dir: ./dist/assets/
+          exclude: |
+            index.html       # geen index hier; die ging naar /configurator/
