@@ -1,4 +1,4 @@
-name: Upload website naar VDX
+name: upload website naar VDX
 
 on:
   push:
