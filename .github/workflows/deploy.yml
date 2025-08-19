@@ -1,4 +1,4 @@
-name: Build & Upload website + configurator (VDX FTP)
+name: Upload website + configurator (VDX FTP, zonder build)
 
 on:
   push:
@@ -7,52 +7,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # === Optioneel: als je straks een 'configurator/' bronmap hebt, bouwen we die ===
-      - name: Setup Node (if configurator exists)
-        if: ${{ hashFiles('configurator/package.json') != '' }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: configurator/package-lock.json
-
-      - name: Install & build configurator (if exists)
-        if: ${{ hashFiles('configurator/package.json') != '' }}
-        working-directory: configurator
-        run: |
-          npm ci
-          npm run build
-
-      # === Normaliseer de dist-map ===
-      # Kies dist uit configurator (als die bestaat), anders root/dist
-      - name: Determine and normalize dist
-        shell: bash
-        run: |
-          set -euxo pipefail
-          if [ -d "configurator/dist" ]; then
-            DIST_DIR="configurator/dist"
-          else
-            DIST_DIR="dist"
-          fi
-
-          # Als index.html per ongeluk in dist/assets/ staat, verplaats 'm dan naar dist/
-          if [ -f "$DIST_DIR/assets/index.html" ] && [ ! -f "$DIST_DIR/index.html" ]; then
-            mv "$DIST_DIR/assets/index.html" "$DIST_DIR/index.html"
-          fi
-
-          echo "DIST_DIR=$DIST_DIR" >> $GITHUB_ENV
-
-      # === Upload 1: root-site naar /httpdocs/ (zonder build- en backup-mappen) ===
+      # Upload 1: je gewone site (root) naar /httpdocs/
       - name: Upload root site (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}     # bv. ftp.jouw-eigen-domein.nl
+          server: ${{ secrets.FTP_SERVER }}     # bv. ftp.jouw-eigen-domein.nl (zonder ftp://)
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
@@ -63,14 +28,13 @@ jobs:
             **/.git*
             **/.github/**
             **/node_modules/**
-            **/dist/**
             **/configurator/**
-            **/Likeabilly/**      # backup-map niet live zetten
+            **/dist/**            # <-- dist niet vanuit root uploaden
             **/.DS_Store
             **/Thumbs.db
             **/*.md
 
-      # === Upload 2: alleen de (genormaliseerde) dist naar /configurator/ ===
+      # Upload 2: je configurator build (zoals nu bij jou): ./dist/assets/ -> /httpdocs/configurator/
       - name: Upload configurator build (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -79,8 +43,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
-          server-dir: /httpdocs/configurator/   # publiek pad
-          local-dir: ./${{ env.DIST_DIR }}/
+          server-dir: /httpdocs/configurator/
+          local-dir: ./dist/assets/
           exclude: |
             **/.DS_Store
             **/Thumbs.db
