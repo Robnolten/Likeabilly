@@ -1,16 +1,14 @@
 name: Upload website via FTP
-
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
-
+    branches: [ "main" ]
+  workflow_dispatch: {}
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Upload to hosting
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
