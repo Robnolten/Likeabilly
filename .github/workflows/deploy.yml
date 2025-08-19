@@ -1,33 +1,28 @@
 name: Upload website via FTP
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-- name: Upload to hosting
-  uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-  with:
-    server: ${{ secrets.FTP_SERVER }}
-    username: ${{ secrets.FTP_USERNAME }}
-    password: ${{ secrets.FTP_PASSWORD }}
-    protocol: ftp      # pas aan naar ftps/sftp als nodig
-    port: 21
-    server-dir: ${{ secrets.FTP_DIR }}
-    local-dir: .
+      - uses: actions/checkout@v4
 
       - name: Upload to hosting
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps            # werkt bij de meeste hosts; zoniet, verander naar: ftp
+          protocol: ftp
+          port: 21
           server-dir: ${{ secrets.FTP_DIR }}
-          local-dir: .              # upload alles uit de hoofdmap
-          exclude: |                # dingen die nooit online hoeven
+          local-dir: .
+          exclude: |
             **/.git*
             **/.github/**
             **/node_modules/**
