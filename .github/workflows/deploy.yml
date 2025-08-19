@@ -33,8 +33,8 @@ jobs:
             **/Thumbs.db
             **/*.md
 
-      # Upload 2: alléén het configurator index.html naar /httpdocs/configurator/
-      - name: Upload configurator index.html
+      # Upload 2: de volledige configurator-map naar /httpdocs/configurator/
+      - name: Upload configurator build (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -45,16 +45,5 @@ jobs:
           server-dir: /httpdocs/configurator/
           local-dir: ./dist/assets/
           exclude: |
-            **/assets/**
-
-      # Upload 3: alle bundel-assets naar /httpdocs/assets/
-      - name: Upload configurator assets
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          server-dir: /httpdocs/assets/
-          local-dir: ./dist/assets/assets/
+            **/.DS_Store
+            **/Thumbs.db
